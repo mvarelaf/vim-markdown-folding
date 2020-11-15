@@ -8,7 +8,7 @@ function! StackedMarkdownFolds()
   elseif thisline =~ '^```$' && nextline =~ '^\s*$'  " end of a fenced block
     return "<2"
   endif
-  
+
   if HeadingDepth(v:lnum) > 0
     return ">1"
   else
@@ -92,28 +92,32 @@ endfunction
 
 function! FoldText()
   let level = HeadingDepth(v:foldstart)
-  let indent = repeat('#', level)
-  let title = substitute(getline(v:foldstart), '^#\+\s\+', '', '')
+  if exists('g:markdown_fold_indent_title')
+    let indent = repeat('  ', level-1)
+    let title = substitute(getline(v:foldstart), '^#\+\s\+', '', '')
+    let spaces_1 = ''
+  else
+    let indent = repeat('#', level)
+    let title = substitute(getline(v:foldstart), '^#\+\s\+', '', '')
+    if level < 6
+      let spaces_1 = repeat(' ', 6 - level)
+    else
+      let spaces_1 = ' '
+    endif
+  endif
   let foldsize = (v:foldend - v:foldstart)
   let linecount = '['.foldsize.' line'.(foldsize>1?'s':'').']'
 
-  if level < 6
-    let spaces_1 = repeat(' ', 6 - level)
-  else
-    let spaces_1 = ' '
-  endif
-
   if exists('*strdisplaywidth')
       let title_width = strdisplaywidth(title)
+      let linecount_width = strdisplaywidth(linecount)
   else
       let title_width = len(title)
+      let linecount_width = len(linecount)
   endif
 
-  if title_width < 40
-    let spaces_2 = repeat(' ', 40 - title_width)
-  else
-    let spaces_2 = ' '
-  endif
+  let spaces_shift = &columns - len(indent) - len(spaces_1) - title_width - linecount_width - (&number * &numberwidth) - 1
+  let spaces_2 = repeat(' ', spaces_shift)
 
   return indent.spaces_1.title.spaces_2.linecount
 endfunction
