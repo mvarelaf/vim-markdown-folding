@@ -116,7 +116,7 @@ function! FoldText()
       let linecount_width = len(linecount)
   endif
 
-  let spaces_shift = &columns - len(indent) - len(spaces_1) - title_width - linecount_width - (&number * &numberwidth) - 1
+  let spaces_shift = winwidth(0) - len(indent) - len(spaces_1) - title_width - linecount_width - (&number * &numberwidth) - 1
   let spaces_2 = repeat(' ', spaces_shift)
 
   return indent.spaces_1.title.spaces_2.linecount
