@@ -35,6 +35,10 @@ function! NestedMarkdownFolds()
 endfunction
 
 " Helpers {{{1
+function! s:SID()
+  return matchstr(expand('<sfile>'), '\zs<SNR>\d\+_\zeSID$')
+endfunction
+
 function! HeadingDepth(lnum)
   let level=0
   let thisline = getline(a:lnum)
@@ -90,7 +94,7 @@ function! s:HasSurroundingFencemarks(lnum)
   return fenceEndPosition != [0,0]
 endfunction
 
-function! FoldText()
+function! s:FoldText()
   let level = HeadingDepth(v:foldstart)
   if exists('g:markdown_fold_indent_title')
     let indent = repeat('  ', level-1)
@@ -144,7 +148,7 @@ endif
 setlocal foldmethod=expr
 
 if g:markdown_fold_override_foldtext
-  setlocal foldtext=FoldText()
+  let &l:foldtext = s:SID() . 'FoldText()'
 endif
 
 let &l:foldexpr =
